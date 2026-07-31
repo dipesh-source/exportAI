@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ExportAI — Export API for Excel &amp; CSV</title>
+<meta name="description" content="Drop-in Export API that gives your inventory or management platform native Excel and CSV export in an afternoon." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+
+    --bg: #EDEFEA;
+    --bg-soft: #E4E7E0;
+    --surface: #FFFFFF;
+    --surface-2: #F5F6F2;
+    --border: #D3D7CD;
+    --border-strong: #B7BCAE;
+    --text: #12181A;
+    --text-dim: #4B534E;
+    --text-faint: #7C837B;
+
+    --accent: #C9581E;
+    --accent-strong: #A6480F;
+    --accent-tint: #F3E2D3;
+    --accent-ink: #FFFFFF;
+
+    --success: #2E8B57;
+    --success-tint: #DFEFE3;
+
+    --grid-line: rgba(18, 24, 26, 0.07);
+    --code-bg: #101512;
+    --code-text: #DCE6DA;
+    --code-accent: #E9975A;
+    --code-dim: #7A8A80;
+    --code-border: #26302B;
+
+    --shadow: 0 1px 2px rgba(18,24,26,0.04), 0 8px 24px rgba(18,24,26,0.06);
+    --radius: 3px;
+
+    --font-display: 'IBM Plex Mono', 'SF Mono', ui-monospace, monospace;
+    --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0C1210;
+      --bg-soft: #101714;
+      --surface: #131A17;
+      --surface-2: #182019;
+      --border: #263029;
+      --border-strong: #38443B;
+      --text: #E9EDE7;
+      --text-dim: #A8B2A5;
+      --text-faint: #6E7A70;
+
+      --accent: #E9975A;
+      --accent-strong: #F3B080;
+      --accent-tint: #24251C;
+      --accent-ink: #10130E;
+
+      --success: #5FBE8A;
+      --success-tint: #16221B;
+
+      --grid-line: rgba(233, 237, 231, 0.06);
+      --code-bg: #0A0D0A;
+      --code-text: #DCE6DA;
+      --code-accent: #E9975A;
+      --code-dim: #63705F;
+      --code-border: #232D24;
+
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.4);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0C1210;
+    --bg-soft: #101714;
+    --surface: #131A17;
+    --surface-2: #182019;
+    --border: #263029;
+    --border-strong: #38443B;
+    --text: #E9EDE7;
+    --text-dim: #A8B2A5;
+    --text-faint: #6E7A70;
+    --accent: #E9975A;
+    --accent-strong: #F3B080;
+    --accent-tint: #24251C;
+    --accent-ink: #10130E;
+    --success: #5FBE8A;
+    --success-tint: #16221B;
+    --grid-line: rgba(233, 237, 231, 0.06);
+    --code-bg: #0A0D0A;
+    --code-text: #DCE6DA;
+    --code-accent: #E9975A;
+    --code-dim: #63705F;
+    --code-border: #232D24;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #EDEFEA;
+    --bg-soft: #E4E7E0;
+    --surface: #FFFFFF;
+    --surface-2: #F5F6F2;
+    --border: #D3D7CD;
+    --border-strong: #B7BCAE;
+    --text: #12181A;
+    --text-dim: #4B534E;
+    --text-faint: #7C837B;
+    --accent: #C9581E;
+    --accent-strong: #A6480F;
+    --accent-tint: #F3E2D3;
+    --accent-ink: #FFFFFF;
+    --success: #2E8B57;
+    --success-tint: #DFEFE3;
+    --grid-line: rgba(18, 24, 26, 0.07);
+    --code-bg: #101512;
+    --code-text: #DCE6DA;
+    --code-accent: #E9975A;
+    --code-dim: #7A8A80;
+    --code-border: #26302B;
+    --shadow: 0 1px 2px rgba(18,24,26,0.04), 0 8px 24px rgba(18,24,26,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  img, svg { display: block; max-width: 100%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  .wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 0 20px; }
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    font-weight: 600;
+  }
+
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+
+  button, .btn { font-family: var(--font-body); cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    display: flex; align-items: baseline; gap: 2px;
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+  .logo .dot { color: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: var(--text-dim); text-decoration: none; font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { display: flex; align-items: center; gap: 16px; }
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-size: 14px; font-weight: 600;
+    border: 1px solid transparent;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.15s ease, border-color .15s ease;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-strong); }
+  .btn-ghost:hover { border-color: var(--text); }
+  .btn-block { width: 100%; }
+  .btn:active { transform: translateY(1px); }
+
+  /* ---------- HERO ---------- */
+  .hero { position: relative; padding: 88px 0 64px; overflow: hidden; }
+  .hero-grid-canvas {
+    position: absolute; inset: -1px;
+    z-index: 0;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center;
+  }
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; }
+  }
+  .hero-copy h1 {
+    font-size: clamp(34px, 4.4vw, 52px);
+    line-height: 1.08;
+    margin: 18px 0 20px;
+  }
+  .hero-copy h1 em {
+    font-style: normal; color: var(--accent);
+  }
+  .hero-copy p.lede {
+    font-size: 17px; color: var(--text-dim); max-width: 480px; margin: 0 0 28px;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .hero-meta {
+    display: flex; gap: 22px; flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 12.5px; color: var(--text-faint);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .hero-meta .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+
+  /* code panel */
+  .code-panel {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .code-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--code-border);
+    font-family: var(--font-mono); font-size: 12px; color: var(--code-dim);
+  }
+  .code-bar .dots { display: flex; gap: 6px; }
+  .code-bar .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--code-border); }
+  .code-body {
+    padding: 18px 18px 20px;
+    font-family: var(--font-mono);
+    font-size: 12.8px;
+    line-height: 1.7;
+    color: var(--code-text);
+    overflow-x: auto;
+  }
+  .code-body .c1 { color: var(--code-dim); }
+  .code-body .c2 { color: var(--code-accent); }
+  .code-body .c3 { color: #8FBF9F; }
+  .code-response {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px dashed var(--code-border);
+    color: var(--code-dim);
+  }
+
+  /* ---------- SECTION SHELL ---------- */
+  section { padding: 76px 0; }
+  .section-head { max-width: 620px; margin: 0 0 44px; }
+  .section-head .eyebrow { display: block; margin-bottom: 12px; }
+  .section-head h2 { font-size: clamp(26px, 3vw, 34px); margin-bottom: 12px; }
+  .section-head p { color: var(--text-dim); font-size: 15.5px; margin: 0; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* ---------- STRIP ---------- */
+  .strip {
+    padding: 26px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+  }
+  .strip-inner {
+    display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: space-between;
+  }
+  .strip-label { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); letter-spacing: 0.06em; text-transform: uppercase; }
+  .strip-items { display: flex; gap: 28px; flex-wrap: wrap; }
+  .strip-items span { font-size: 14px; color: var(--text-dim); font-weight: 500; }
+
+  /* ---------- FEATURES ---------- */
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  @media (max-width: 860px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feature {
+    background: var(--surface);
+    padding: 26px 24px;
+  }
+  .feature .fi {
+    width: 30px; height: 30px;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+  .feature h3 { font-size: 15.5px; margin-bottom: 8px; }
+  .feature p { font-size: 13.8px; color: var(--text-dim); margin: 0; }
+
+  /* ---------- HOW ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media (max-width: 860px) { .steps { grid-template-columns: 1fr; } }
+  .step { position: relative; padding-top: 8px; }
+  .step-num {
+    font-family: var(--font-mono); font-size: 12px; color: var(--accent-strong);
+    border: 1px solid var(--border-strong); border-radius: 999px;
+    width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px; font-weight: 600;
+  }
+  .step h3 { font-size: 16px; margin-bottom: 8px; }
+  .step p { color: var(--text-dim); font-size: 14px; margin: 0; }
+  .step-connector {
+    display: none;
+  }
+
+  /* ---------- PRICING ---------- */
+  .billing-note {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-faint);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 6px 14px; margin-bottom: 36px;
+  }
+  .billing-note .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    align-items: stretch;
+  }
+  @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; } }
+
+  .plan {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 30px 28px 28px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .plan.featured {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+  .plan-badge {
+    position: absolute; top: -12px; right: 24px;
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .plan-name { font-family: var(--font-display); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 14px; }
+  .plan.featured .plan-name { color: var(--accent-strong); }
+  .plan-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+  .plan-price .amt { font-family: var(--font-display); font-size: 42px; font-weight: 700; letter-spacing: -0.01em; }
+  .plan-price .per { color: var(--text-faint); font-size: 14px; }
+
+  /* -- lifetime sale card -- */
+  .plan.sale {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    animation: sale-glow 2.6s ease-in-out infinite;
+  }
+  @keyframes sale-glow {
+    0%, 100% { box-shadow: var(--shadow), 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent); }
+    50% { box-shadow: var(--shadow), 0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent); }
+  }
+  .sale-badge {
+    background: linear-gradient(100deg, var(--accent-strong), var(--accent), var(--accent-strong));
+    background-size: 220% 100%;
+    animation: sale-shimmer 2.8s linear infinite;
+  }
+  @keyframes sale-shimmer {
+    0% { background-position: 0% 0; }
+    100% { background-position: 220% 0; }
+  }
+  .sale-price .was {
+    font-family: var(--font-mono); font-size: 18px; color: var(--text-faint);
+    text-decoration: line-through; text-decoration-color: var(--text-faint);
+    margin-right: 2px;
+  }
+  .sale-timer {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    background: var(--accent-tint); border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px; margin-bottom: 20px;
+  }
+  .timer-clock { font-size: 13px; font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  .sale-cta {
+    animation: sale-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes sale-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+    50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); }
+  }
+  .sale-note {
+    text-align: center; font-size: 11.5px; color: var(--text-faint); margin-top: 12px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .plan.sale, .sale-badge, .sale-cta { animation: none; }
+  }
+  .plan-sub { font-size: 13.5px; color: var(--text-dim); margin-bottom: 22px; }
+
+  .plan-limits {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .limit-item .lv { font-family: var(--font-mono); font-size: 16px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; display: block; }
+  .limit-item .lk { font-size: 11.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .plan-feats { list-style: none; margin: 0 0 26px; padding: 0; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .plan-feats li { display: flex; gap: 10px; font-size: 13.8px; color: var(--text-dim); align-items: flex-start; }
+  .plan-feats li svg { flex-shrink: 0; width: 15px; height: 15px; margin-top: 2px; color: var(--success); }
+
+  /* limits table */
+  .limits-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
+  table.limits { width: 100%; border-collapse: collapse; font-size: 13.8px; min-width: 640px; }
+  table.limits caption { text-align: left; padding: 16px 20px 0; font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+  table.limits th, table.limits td { padding: 13px 20px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.limits thead th { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); background: var(--surface-2); }
+  table.limits td { font-variant-numeric: tabular-nums; color: var(--text-dim); }
+  table.limits td.plan-col { color: var(--text); font-weight: 600; font-family: var(--font-mono); font-size: 12.8px; }
+  table.limits tr:last-child td { border-bottom: none; }
+
+  /* ---------- FAQ ---------- */
+  .faq { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .faq-item { background: var(--surface); }
+  .faq-item summary {
+    padding: 18px 22px; cursor: pointer; font-weight: 600; font-size: 14.5px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    list-style: none;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+'; font-family: var(--font-mono); font-size: 18px; color: var(--accent); flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item .faq-a { padding: 0 22px 20px; color: var(--text-dim); font-size: 14px; max-width: 700px; margin: 0; }
+
+  /* ---------- CTA ---------- */
+  .cta-band {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 52px 48px;
+    display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
+  }
+  .cta-band h2 { font-size: 26px; margin-bottom: 8px; }
+  .cta-band p { color: var(--text-dim); margin: 0; font-size: 14.5px; }
+  .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* ---------- FOOTER ---------- */
+  footer { border-top: 1px solid var(--border); padding: 44px 0 40px; }
+  .foot-inner { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .foot-brand .logo { margin-bottom: 10px; }
+  .foot-brand p { font-size: 13px; color: var(--text-faint); max-width: 280px; margin: 0; }
+  .foot-cols { display: flex; gap: 56px; flex-wrap: wrap; }
+  .foot-col h4 { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); margin: 0 0 14px; font-weight: 600; }
+  .foot-col a { display: block; font-size: 13.8px; color: var(--text-dim); text-decoration: none; margin-bottom: 10px; }
+  .foot-col a:hover { color: var(--text); }
+  .foot-bottom { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+  /* ---------- SALES MODAL ---------- */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 55%, black 25%);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    animation: modal-fade 0.18s ease;
+  }
+  .modal-overlay[hidden] { display: none; }
+  @keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal-card {
+    position: relative;
+    width: 100%; max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 32px 30px 28px;
+    text-align: center;
+    animation: modal-pop 0.22s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes modal-pop {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border); border-radius: 50%;
+    color: var(--text-faint);
+  }
+  .modal-close:hover { color: var(--text); border-color: var(--border-strong); }
+  .modal-close svg { width: 13px; height: 13px; }
+
+  .modal-avatar {
+    width: 56px; height: 56px; margin: 4px auto 16px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--accent), var(--accent-strong));
+    color: var(--accent-ink);
+    font-family: var(--font-display); font-weight: 700; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.02em;
+  }
+  .modal-card .eyebrow { display: block; margin-bottom: 10px; }
+  .modal-card h3 { font-size: 21px; margin-bottom: 10px; }
+  .modal-sub { font-size: 13.8px; color: var(--text-dim); margin: 0 0 22px; }
+
+  .modal-person {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .modal-person-name { font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+  .modal-person-role { font-size: 12.5px; color: var(--accent-strong); margin-top: 3px; }
+
+  .modal-email {
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    font-family: var(--font-mono); font-size: 13.5px; font-weight: 600;
+    color: var(--text); text-decoration: none;
+    background: var(--accent-tint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s ease;
+  }
+  .modal-email:hover { border-color: var(--accent); }
+  .modal-email svg { width: 16px; height: 16px; color: var(--accent-strong); flex-shrink: 0; }
+
+  .modal-copy {
+    display: block; width: 100%;
+    background: transparent; border: none;
+    font-size: 12.5px; color: var(--text-faint);
+    text-decoration: underline; text-decoration-color: var(--border-strong);
+    padding: 4px; margin-bottom: 14px;
+  }
+  .modal-copy:hover { color: var(--text); }
+  .modal-copy.copied { color: var(--success); text-decoration: none; }
+
+  .modal-footnote { font-size: 11.5px; color: var(--text-faint); margin: 0; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="logo">Export<span class="dot">AI</span></a>
+    <div class="nav-links">
+      <a href="#features">Product</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <canvas class="hero-grid-canvas" id="gridCanvas"></canvas>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow">Export API for SaaS platforms</span>
+      <h1>Ship <em>Export to Excel &amp; CSV</em> without building it yourself.</h1>
+      <p class="lede">One endpoint turns any dataset in your inventory, ERP, or management platform into a downloadable .xlsx or .csv file — styled, paginated, and delivered in milliseconds. Your team writes zero export code.</p>
+      <div class="hero-meta">
+        <span><i class="pip"></i> 99.95% uptime, last 12 months</span>
+        <span>Avg. response 180ms</span>
+        <span>SOC 2 Type II in progress</span>
+      </div>
+    </div>
+
+    <div class="code-panel">
+      <div class="code-bar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>POST /v1/export</span>
+      </div>
+      <div class="code-body"><span class="c1">curl</span> https://api.exportai.dev/v1/export \
+  <span class="c1">-H</span> <span class="c2">"Authorization: Bearer eai_live_••••"</span> \
+  <span class="c1">-H</span> <span class="c2">"Content-Type: application/json"</span> \
+  <span class="c1">-d</span> <span class="c3">'{
+    "source": "inventory.stock_levels",
+    "format": "xlsx",
+    "filters": { "warehouse": "SEA-1" },
+    "template": "branded"
+  }'</span>
+<div class="code-response"><span class="c1">→</span> 200 OK · <span class="c2">stock_levels_2026-07-31.xlsx</span> · 4.2MB
+<span class="c1">→</span> download_url expires in 15m</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap strip-inner">
+    <span class="strip-label">Built for</span>
+    <div class="strip-items">
+      <span>Inventory &amp; warehouse systems</span>
+      <span>Field service platforms</span>
+      <span>Fleet &amp; asset management</span>
+      <span>ERP &amp; procurement tools</span>
+      <span>Internal admin dashboards</span>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">What you're integrating</span>
+      <h2>Export, handled — down to the row limits your users actually hit.</h2>
+      <p>A REST API and SDKs that sit behind your existing "Export" button. You keep your UI; we handle formatting, large-dataset streaming, and delivery.</p>
+    </div>
+    <div class="feature-grid">
+
+      <div class="feature">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18M9 9v11"/></svg>
+        <h3>Excel &amp; CSV, natively</h3>
+        <p>.xlsx with real formatting, frozen headers, and column types — not a CSV with a spreadsheet icon. Plain .csv and .xls also supported.</p>
+      </div>
+
+      <div class="feature">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 12v6M4 12h6"/></svg>
+        <h3>Streams datasets of any size</h3>
+        <p>Chunked generation for exports past a million rows, with no request timeout and no memory spike on your servers.</p>
+      </div>
+
+      <div class="feature">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+        <h3>Webhooks on completion</h3>
+        <p>Fire-and-forget large exports. We call your endpoint with a signed download URL the moment the file is ready.</p>
+      </div>
+
+      <div class="feature">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+        <h3>Field mapping &amp; templates</h3>
+        <p>Rename, reorder, and format columns per customer without redeploying — configure once in the dashboard, reuse via template ID.</p>
+      </div>
+
+      <div class="feature">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+        <h3>Scheduled exports</h3>
+        <p>Let end users set up a daily or weekly export that lands in their inbox or S3 bucket — no cron job on your side.</p>
+      </div>
+
+      <div class="feature">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <h3>Full audit log</h3>
+        <p>Every export is logged with requester, row count, and filters applied — export the audit log itself, naturally.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Integration</span>
+      <h2>Live in an afternoon, not a sprint.</h2>
+      <p>Most teams replace a hand-rolled export function with three calls to ExportAI.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Connect a source</h3>
+        <p>Point ExportAI at a query, a REST endpoint, or push rows directly — no data leaves your infrastructure until export time.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Map fields once</h3>
+        <p>Define column names, order, and formatting in the dashboard. Save it as a template and reuse it across every request.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Call /export</h3>
+        <p>Your existing "Export" button now calls one endpoint. Get back a signed download URL or a webhook when it's ready.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Pricing</span>
+      <h2>One plan for every stage of scale — billed monthly, cancel anytime.</h2>
+      <p>Plans are named for how much data moves through them: a <strong>Row</strong> plan for a single feature, up to a full <strong>Workbook</strong> of export traffic across your product. <strong>Sheet</strong> is on a limited-time lifetime offer — pay once instead of monthly.</p>
+    </div>
+    <div class="billing-note"><i class="pip"></i> Prices in USD · billed monthly · overage billed per 1,000 exports</div>
+
+    <div class="pricing-grid">
+
+      <div class="plan">
+        <div class="plan-name">Row</div>
+        <div class="plan-price"><span class="amt">$29</span><span class="per">/ month</span></div>
+        <div class="plan-sub">For a single export feature in production.</div>
+        <div class="plan-limits">
+          <div class="limit-item"><span class="lv">60</span><span class="lk">per hour</span></div>
+          <div class="limit-item"><span class="lv">500</span><span class="lk">per day</span></div>
+          <div class="limit-item"><span class="lv">5,000</span><span class="lk">per month</span></div>
+          <div class="limit-item"><span class="lv">2</span><span class="lk">formats (CSV, XLSX)</span></div>
+        </div>
+        <ul class="plan-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> CSV &amp; XLSX export</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> 1 field-mapping template</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Up to 50k rows per file</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Email support, 2 business days</li>
+        </ul>
+        <a href="#" class="btn btn-ghost btn-block" data-sales-cta>Start with Row</a>
+      </div>
+
+      <div class="plan featured sale">
+        <div class="plan-badge sale-badge">75% off · lifetime</div>
+        <div class="plan-name">Sheet — Lifetime</div>
+        <div class="plan-price sale-price">
+          <span class="was">$396</span>
+          <span class="amt">$99</span>
+          <span class="per">one-time</span>
+        </div>
+        <div class="plan-sub">Pay once. Export unlimited, forever — no monthly bill, ever again.</div>
+        <div class="sale-timer">
+          <span>Deal ends in</span>
+          <span class="timer-clock" id="saleTimer">47:59:59</span>
+        </div>
+        <div class="plan-limits">
+          <div class="limit-item"><span class="lv">∞</span><span class="lk">exports / hour</span></div>
+          <div class="limit-item"><span class="lv">∞</span><span class="lk">exports / day</span></div>
+          <div class="limit-item"><span class="lv">∞</span><span class="lk">exports / month</span></div>
+          <div class="limit-item"><span class="lv">0%</span><span class="lk">downtime, guaranteed</span></div>
+        </div>
+        <ul class="plan-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Unlimited exports, forever — no caps</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> 99.99% uptime SLA, 0% billed downtime</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> All formats: CSV, XLSX, XLS &amp; PDF</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Unlimited field-mapping templates</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Completion webhooks, no throttling</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> White-label branding included</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Free access to every future feature</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Priority lifetime support</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-block sale-cta" data-sales-cta>Claim lifetime deal — $99</a>
+        <div class="sale-note">One-time payment · no subscription · 30-day money-back guarantee</div>
+      </div>
+
+      <div class="plan">
+        <div class="plan-name">Workbook</div>
+        <div class="plan-price"><span class="amt">$349</span><span class="per">/ month</span></div>
+        <div class="plan-sub">For platforms selling export as a feature to their own customers.</div>
+        <div class="plan-limits">
+          <div class="limit-item"><span class="lv">3,000</span><span class="lk">per hour</span></div>
+          <div class="limit-item"><span class="lv">50,000</span><span class="lk">per day</span></div>
+          <div class="limit-item"><span class="lv">1,000,000</span><span class="lk">per month</span></div>
+          <div class="limit-item"><span class="lv">All</span><span class="lk">formats + custom</span></div>
+        </div>
+        <ul class="plan-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Everything in Sheet</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Custom rate limits per API key</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> White-label file branding</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> 99.9% uptime SLA</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5 11-11"/></svg> Dedicated Slack channel</li>
+        </ul>
+        <a href="#" class="btn btn-ghost btn-block" data-sales-cta>Talk to sales</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="wrap">
+    <div class="limits-table-wrap">
+      <table class="limits">
+        <caption>Full rate limits by plan — exceeding a limit queues the request rather than dropping it</caption>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Per hour</th>
+            <th>Per day</th>
+            <th>Per month</th>
+            <th>Max file size</th>
+            <th>Overage rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="plan-col">Row</td>
+            <td>60</td>
+            <td>500</td>
+            <td>5,000</td>
+            <td>50,000 rows</td>
+            <td>$4 / 1,000 exports</td>
+          </tr>
+          <tr>
+            <td class="plan-col">Sheet (lifetime)</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+            <td>Unlimited (streamed)</td>
+            <td>None — $99 once</td>
+          </tr>
+          <tr>
+            <td class="plan-col">Workbook</td>
+            <td>3,000</td>
+            <td>50,000</td>
+            <td>1,000,000</td>
+            <td>Unlimited (streamed)</td>
+            <td>$1.20 / 1,000 exports</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Questions</span>
+      <h2>Before you integrate</h2>
+    </div>
+    <div class="faq">
+      <details class="faq-item" open>
+        <summary>What happens if we go over our monthly export limit?</summary>
+        <p class="faq-a">Requests keep succeeding — we bill overage per 1,000 exports at the rate for your plan rather than rejecting calls. You'll see overage usage on your dashboard in real time and can set an alert threshold.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does ExportAI store our data?</summary>
+        <p class="faq-a">No. Data is streamed through for the duration of a single export job and discarded once the file is generated. Generated files live behind a signed URL for 15 minutes, then are deleted.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can we brand the exported files for our own customers?</summary>
+        <p class="faq-a">Yes, on the Sheet and Workbook plans. You can set a logo, header row styling, and filename pattern per template, so files look native to your product, not to ours.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How large a file can a single export produce?</summary>
+        <p class="faq-a">Row supports up to 50,000 rows per file; Sheet up to 1,000,000 rows via streamed generation; Workbook has no fixed cap and is provisioned to your traffic pattern.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Do you offer an annual option?</summary>
+        <p class="faq-a">All plans above are billed monthly with no lock-in. If you want annual billing, our sales team can quote a discounted annual rate on the Workbook plan.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2>Your users already click "Export." Make it actually work.</h2>
+        <p>Get an API key and your first 250 exports free — no card required.</p>
+      </div>
+      <div class="cta-actions">
+        <a href="#" class="btn btn-primary">Get API key</a>
+        <a href="#" class="btn btn-ghost">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div class="foot-brand">
+        <a href="#" class="logo">Export<span class="dot">AI</span></a>
+        <p>Export-to-Excel and CSV as an API. Built for the "Export" button every inventory and management platform already has.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#">Status</a>
+          <a href="#">Changelog</a>
+        </div>
+        <div class="foot-col">
+          <h4>Developers</h4>
+          <a href="#">API reference</a>
+          <a href="#">SDKs</a>
+          <a href="#">Webhooks</a>
+          <a href="#">Rate limits</a>
+        </div>
+        <div class="foot-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Security</a>
+          <a href="#">Terms</a>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 ExportAI. All rights reserved.</span>
+      <span>Prices in USD. Rate limits enforced per API key.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="salesModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="salesModalTitle">
+    <button type="button" class="modal-close" id="salesModalClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="modal-avatar">DH</div>
+    <span class="eyebrow">Talk to sales</span>
+    <h3 id="salesModalTitle">Let's get you set up.</h3>
+    <p class="modal-sub">Questions on plans, volume pricing, or the lifetime deal? Reach out directly — no ticket queue, no bot.</p>
+    <div class="modal-person">
+      <div class="modal-person-name">Dennis Hoepner</div>
+      <div class="modal-person-role">Head of Sales, ExportAI</div>
+    </div>
+    <a class="modal-email" href="mailto:dennis.hoepner55@gmail.com?subject=ExportAI%20—%20Sales%20inquiry">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      <span>dennis.hoepner55@gmail.com</span>
+    </a>
+    <button type="button" class="modal-copy" id="salesModalCopy">Copy email address</button>
+    <p class="modal-footnote">Typical reply time: under 4 business hours.</p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var canvas = document.getElementById('gridCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var cell = 34;
+    var cols, rows, cells, w, h, dpr;
+
+    function themeAccent() {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      return v || '#C9581E';
+    }
+    function themeGrid() {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--grid-line').trim();
+      return v || 'rgba(0,0,0,0.06)';
+    }
+
+    function resize() {
+      var rect = canvas.parentElement.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = rect.width; h = rect.height;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cols = Math.ceil(w / cell) + 1;
+      rows = Math.ceil(h / cell) + 1;
+      cells = [];
+      for (var i = 0; i < 26; i++) {
+        cells.push({
+          x: Math.floor(Math.random() * cols),
+          y: Math.floor(Math.random() * rows),
+          t: Math.random() * Math.PI * 2,
+          speed: 0.015 + Math.random() * 0.02
+        });
+      }
+    }
+
+    function draw(time) {
+      ctx.clearRect(0, 0, w, h);
+      var gridColor = themeGrid();
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var x = 0; x <= cols; x++) {
+        ctx.moveTo(x * cell + 0.5, 0);
+        ctx.lineTo(x * cell + 0.5, h);
+      }
+      for (var y = 0; y <= rows; y++) {
+        ctx.moveTo(0, y * cell + 0.5);
+        ctx.lineTo(w, y * cell + 0.5);
+      }
+      ctx.stroke();
+
+      var accent = themeAccent();
+      cells.forEach(function (c) {
+        c.t += c.speed;
+        var alpha = (Math.sin(c.t) + 1) / 2 * 0.35;
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = alpha;
+        ctx.fillRect(c.x * cell + 1, c.y * cell + 1, cell - 2, cell - 2);
+      });
+      ctx.globalAlpha = 1;
+
+      if (!reduceMotion) requestAnimationFrame(draw);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    draw(0);
+  })();
+
+  (function () {
+    var el = document.getElementById('saleTimer');
+    if (!el) return;
+    var KEY = 'exportai_sale_deadline';
+    var WINDOW_MS = 48 * 60 * 60 * 1000;
+    var deadline = Number(localStorage.getItem(KEY));
+    if (!deadline || deadline < Date.now()) {
+      deadline = Date.now() + WINDOW_MS;
+      localStorage.setItem(KEY, String(deadline));
+    }
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      var remaining = Math.max(0, deadline - Date.now());
+      var h = Math.floor(remaining / 3600000);
+      var m = Math.floor((remaining % 3600000) / 60000);
+      var s = Math.floor((remaining % 60000) / 1000);
+      el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  (function () {
+    var modal = document.getElementById('salesModal');
+    if (!modal) return;
+    var closeBtn = document.getElementById('salesModalClose');
+    var copyBtn = document.getElementById('salesModalCopy');
+    var email = 'dennis.hoepner55@gmail.com';
+    var lastFocused = null;
+
+    function openModal() {
+      lastFocused = document.activeElement;
+      modal.hidden = false;
+      closeBtn.focus();
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      if (lastFocused) lastFocused.focus();
+    }
+
+    document.querySelectorAll('[data-sales-cta]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openModal();
+      });
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !modal.hidden) closeModal();
+    });
+
+    copyBtn.addEventListener('click', function () {
+      var done = function () {
+        copyBtn.textContent = 'Copied to clipboard';
+        copyBtn.classList.add('copied');
+        setTimeout(function () {
+          copyBtn.textContent = 'Copy email address';
+          copyBtn.classList.remove('copied');
+        }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(done).catch(done);
+      } else {
+        done();
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
